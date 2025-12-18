@@ -31,7 +31,7 @@ const router = createBrowserRouter([
             },
             {
                 path:'/donate',
-                element:<Donate></Donate>
+                element:<PrivateRoutes><Donate></Donate></PrivateRoutes>
             },
             {
                 path:'/payment-success',
