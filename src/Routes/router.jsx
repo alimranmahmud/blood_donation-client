@@ -12,6 +12,7 @@ import MyRequest from "../Pages/DashboardPage/MyRequest";
 import Donate from "../Pages/Donate";
 import PaymentSuccess from "../Pages/PaymentSuccess";
 import SearchRequest from "../Pages/SearchRequest";
+import AllRequest from "../Pages/AllRequest";
 
 const router = createBrowserRouter([
     {
@@ -41,6 +42,10 @@ const router = createBrowserRouter([
             {
                 path:'/search',
                 element:<SearchRequest></SearchRequest>
+            },
+            {
+                path:'/all-request',
+                element:<AllRequest></AllRequest>
             }
         ]
     },

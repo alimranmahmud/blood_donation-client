@@ -13,7 +13,7 @@ const Navbar = () => {
   const navLinks = (
     <>
       <li>
-        <NavLink to="/requests" className={({ isActive }) => isActive ? "text-red-600 font-semibold" : ""}>
+        <NavLink to="/all-request" className={({ isActive }) => isActive ? "text-red-600 font-semibold" : ""}>
           All Requests
         </NavLink>
       </li>

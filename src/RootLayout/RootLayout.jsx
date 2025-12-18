@@ -1,16 +1,24 @@
-import React from 'react';
-import { Outlet } from 'react-router';
-import Navbar from '../Componets/Navbar';
-import Footer from '../Componets/Footer';
+import { Outlet } from "react-router";
+import Navbar from "../Componets/Navbar";
+import Footer from "../Componets/Footer";
 
-const RootLayout = () => {
-    return (
-        <div>
-            <Navbar></Navbar>
-            <Outlet></Outlet>
-            <Footer></Footer>
-        </div>
-    );
+const MainLayout = () => {
+  return (
+    <div className="flex flex-col min-h-screen">
+      
+      {/* Navbar */}
+      <Navbar />
+
+      {/* Main content */}
+      <div className="flex-grow">
+        <Outlet />
+      </div>
+
+      {/* Footer */}
+      <Footer/>
+
+    </div>
+  );
 };
 
-export default RootLayout;
+export default MainLayout;
