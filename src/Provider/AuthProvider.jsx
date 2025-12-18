@@ -50,7 +50,7 @@ const AuthProvider = ({ children }) => {
         //user roll find
     useEffect(() => {
         if (!user) return;
-        axios.get(`http://localhost:5000/users/role/${user.email}`)
+        axios.get(`https://blood-web-server.vercel.app/users/role/${user.email}`)
             .then(res => {
                 setRole(res.data.role)
                             setUserStatus(res.data.status)

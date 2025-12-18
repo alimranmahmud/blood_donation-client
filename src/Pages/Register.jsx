@@ -72,15 +72,8 @@ const Register = () => {
                     }).then(() => {
                         setUser(userCredential.user)
 
-                        //userinfo set Database
-                        // axios.post('http://localhost:5000/users', formData)
-                        //     .then(res => {
-                        //         console.log(res.data)
-                        //     })
-                        //     .catch(err => {
-                        //         console.log(err)
-                        //     })
-                        fetch('http://localhost:5000/users', {
+                      
+                        fetch('https://blood-web-server.vercel.app/users', {
                             method: 'POST',
                             headers: {
                                 'content-type': 'application/json'
