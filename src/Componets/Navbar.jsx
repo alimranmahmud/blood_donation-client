@@ -20,7 +20,7 @@ const handleLogout = ()=>{
         tabIndex="-1"
         className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
         <li><Link>All request</Link></li>
-        <li><Link>Search</Link></li>
+        <li><Link to='/search'>Search</Link></li>
         <li><Link to={'/donate'}>Donate</Link></li>
       </ul>
     </div>
@@ -29,7 +29,7 @@ const handleLogout = ()=>{
   <div className="navbar-center hidden lg:flex">
     <ul className="menu menu-horizontal px-1">
        <li><Link>All request</Link></li>
-        <li><Link>Search</Link></li>
+        <li><Link to="/search">Search</Link></li>
         <li><Link to={'/donate'}>Donate</Link></li>
           
     </ul>
