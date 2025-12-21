@@ -13,11 +13,13 @@ import Donate from "../Pages/Donate";
 import PaymentSuccess from "../Pages/PaymentSuccess";
 import SearchRequest from "../Pages/SearchRequest";
 import AllRequest from "../Pages/AllRequest";
+import BloodRequestDetails from "../Pages/BloodRequestDetails ";
 
 const router = createBrowserRouter([
     {
         path: '/',
         element: <RootLayout></RootLayout>,
+        
         children: [
             {
                 path: '/',
@@ -32,21 +34,40 @@ const router = createBrowserRouter([
                 Component: Register
             },
             {
-                path:'/donate',
-                element:<PrivateRoutes><Donate></Donate></PrivateRoutes>
+                path: '/donate',
+                element: <PrivateRoutes><Donate></Donate></PrivateRoutes>
             },
             {
-                path:'/payment-success',
-                element:<PaymentSuccess></PaymentSuccess>
+                path: '/payment-success',
+                element: <PaymentSuccess></PaymentSuccess>
             },
             {
-                path:'/search',
-                element:<SearchRequest></SearchRequest>
+                path: '/search',
+                element: <SearchRequest></SearchRequest>
             },
             {
-                path:'/all-request',
-                element:<AllRequest></AllRequest>
-            }
+                path: '/all-request',
+                element: <AllRequest></AllRequest>
+            },
+            {
+  path: "/card_details/:id",
+  loader: async ({ params }) => {
+    const res = await fetch(
+      `http://localhost:5000/card_details/${params.id}`
+    );
+
+    if (!res.ok) {
+      throw new Response("Blood Request Not Found", {
+        status: res.status,
+        statusText: "Not Found",
+      });
+    }
+
+    return res.json();
+  },
+  element: <BloodRequestDetails />,
+}
+
         ]
     },
 
@@ -63,18 +84,19 @@ const router = createBrowserRouter([
 
             {
                 path: 'add-request',
-                element:<AddRequest></AddRequest>
+                element: <AddRequest></AddRequest>
             },
             {
                 path: 'all-users',
-                element:<AllUsers></AllUsers>
+                element: <AllUsers></AllUsers>
             },
             {
                 path: 'my-request',
                 element: <MyRequest></MyRequest>
             }
         ]
-    }
+    },
+
 
 
 ])

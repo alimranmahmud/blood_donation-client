@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../Provider/AuthProvider";
 import useAxiosSecure from "../Hooks/useAxiosSecure";
+import BloodRequestCard from "../Componets/BloodRequestCard";
 
 const AllRequest = () => {
   const { role, user } = useContext(AuthContext);
@@ -62,58 +63,12 @@ const AllRequest = () => {
 
       {/* Table */}
       <div className="overflow-x-auto">
-        <table className="table table-zebra">
-          <thead className="bg-red-100">
-            <tr>
-              <th>#</th>
-              <th>Recipient</th>
-              <th>Blood Group</th>
-              <th>Location</th>
-              <th>Hospital</th>
-              <th>Status</th>
-           
-            </tr>
-          </thead>
-
-          <tbody>
-            {filteredRequests.map((req, index) => (
-              <tr key={req._id}>
-                <td>{index + 1}</td>
-
-                <td className="text-black">{req.recipientName}</td>
-
-                <td>
-                  <span className="badge badge-error text-white">
-                    {req.bloodGroup}
-                  </span>
-                </td>
-
-                <td>
-                  {req.district}, {req.upazila}
-                </td>
-
-                <td>{req.hospital}</td>
-
-                <td>
-                  <span
-                    className={`badge
-                      ${req.status === "pending" && "badge-warning"}
-                      ${req.status === "inprogress" && "badge-info"}
-                      ${req.status === "done" && "badge-success"}
-                      ${req.status === "canceled" && "badge-error"}
-                    `}
-                  >
-                    {req.status}
-                  </span>
-                </td>
-
-                <td>
-             
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+       
+     <div className="grid gap-10 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 w-11/12 mx-auto">
+         {
+        filteredRequests.map(card=><BloodRequestCard key={card._id} card={card}></BloodRequestCard>)
+      }
+     </div>
 
         {filteredRequests.length === 0 && (
           <p className="text-center text-gray-500 mt-6">
