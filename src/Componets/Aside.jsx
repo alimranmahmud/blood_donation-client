@@ -167,7 +167,7 @@ const Aside = () => {
                     Dashboard
                 </NavLink>
 
-                {role === 'admin' && (
+                {/* {role === 'admin' && ( */}
                     <NavLink
                         to="/dashboard/add-request"
                         className={navClass}
@@ -175,7 +175,7 @@ const Aside = () => {
                         <FaUsers />
                         Add Request
                     </NavLink>
-                )}
+                {/* )} */}
 
                 {role === 'admin' && (
                     <NavLink

@@ -1,141 +1,107 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { AuthContext } from '../../Provider/AuthProvider';
-import useAxiosSecure from '../../Hooks/useAxiosSecure';
-import { motion } from 'framer-motion';
-import {
-  FaHeartbeat,
-  FaUsers,
-  FaTint,
-  FaMoneyBillWave
-} from 'react-icons/fa';
+import React, { useEffect, useState } from "react";
+import useAxiosSecure from "../../Hooks/useAxiosSecure";
+import { motion } from "framer-motion";
+import StatCard from "./StatCard";
 
 const MainDashboard = () => {
-  const { user, role } = useContext(AuthContext);
   const axiosSecure = useAxiosSecure();
 
   const [stats, setStats] = useState({
-    totalUsers: 0,
-    totalRequests: 0,
+    users: 0,
+    requests: 0,
     pending: 0,
-    done: 0,
-    totalFunds: 0
+    completed: 0,
   });
 
+  const [recentRequests, setRecentRequests] = useState([]);
+
   useEffect(() => {
-    if (role === 'admin' || role === 'volunteer') {
-      axiosSecure.get('/donation-requests')
-        .then(res => {
-          const all = res.data;
-          setStats(prev => ({
-            ...prev,
-            totalRequests: all.length,
-            pending: all.filter(r => r.status === 'pending').length,
-            done: all.filter(r => r.status === 'done').length
-          }));
-        });
+    loadDashboard();
+  }, []);
 
-      axiosSecure.get('/users')
-        .then(res => {
-          setStats(prev => ({
-            ...prev,
-            totalUsers: res.data.length
-          }));
-        });
+  const loadDashboard = async () => {
+    const usersRes = await axiosSecure.get("/users");
+    const requestRes = await axiosSecure.get("/donation-requests");
 
-      axiosSecure.get('/payments')
-        .then(res => {
-          const total = res.data.reduce((sum, p) => sum + p.amount, 0);
-          setStats(prev => ({
-            ...prev,
-            totalFunds: total
-          }));
-        });
-    }
+    const allRequests = requestRes.data;
 
-    if (role === 'donor') {
-      axiosSecure.get('/my-request')
-        .then(res => {
-          const my = res.data.request;
-          setStats(prev => ({
-            ...prev,
-            totalRequests: my.length,
-            pending: my.filter(r => r.status === 'pending').length,
-            done: my.filter(r => r.status === 'done').length
-          }));
-        });
-    }
-  }, [axiosSecure, role]);
+    setStats({
+      users: usersRes.data.length,
+      requests: allRequests.length,
+      pending: allRequests.filter(r => r.status === "pending").length,
+      completed: allRequests.filter(r => r.status === "done").length,
+    });
 
-  const Card = ({ icon, title, value, color }) => (
-    <motion.div
-      whileHover={{ scale: 1.05 }}
-      className={`p-6 rounded-xl shadow-md bg-white border-l-4 ${color}`}
-    >
-      <div className="flex items-center gap-4">
-        <div className="text-3xl text-red-600">{icon}</div>
-        <div>
-          <p className="text-gray-500 text-sm">{title}</p>
-          <h2 className="text-2xl font-bold">{value}</h2>
-        </div>
-      </div>
-    </motion.div>
-  );
+    setRecentRequests(allRequests.slice(0, 5));
+  };
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
       className="p-6"
     >
-      {/* Welcome */}
-      <h1 className="text-3xl font-bold text-red-600 mb-2">
-        Welcome, {user?.displayName || 'User'} ❤️
-      </h1>
-      <p className="text-gray-500 mb-6">
-        Thank you for being part of the Blood Donation Platform
-      </p>
+      <h2 className="text-3xl font-bold text-red-600 mb-6">
+        🩸 Blood Donation Dashboard
+      </h2>
 
-      {/* Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {(role === 'admin' || role === 'volunteer') && (
-          <Card
-            icon={<FaUsers />}
-            title="Total Users"
-            value={stats.totalUsers}
-            color="border-red-500"
-          />
-        )}
+      {/* 🔹 Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <StatCard title="Total Users" value={stats.users} />
+        <StatCard title="Total Requests" value={stats.requests} />
+        <StatCard title="Pending Requests" value={stats.pending} />
+        <StatCard title="Completed" value={stats.completed} />
+      </div>
 
-        <Card
-          icon={<FaHeartbeat />}
-          title="Total Requests"
-          value={stats.totalRequests}
-          color="border-red-500"
-        />
+      {/* 🔹 Recent Requests */}
+      <div className="bg-white rounded-xl shadow-md p-4">
+        <h3 className="text-xl font-semibold mb-4 text-gray-700">
+          Recent Blood Requests
+        </h3>
 
-        <Card
-          icon={<FaTint />}
-          title="Pending Requests"
-          value={stats.pending}
-          color="border-yellow-500"
-        />
+        <div className="overflow-x-auto">
+          <table className="table table-zebra">
+            <thead className="bg-red-100">
+              <tr>
+                <th>#</th>
+                <th>Recipient</th>
+                <th>Hospital</th>
+                <th>Blood</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {recentRequests.map((req, index) => (
+                <tr key={req._id}>
+                  <td>{index + 1}</td>
+                  <td>{req.recipientName}</td>
+                  <td>{req.hospital}</td>
+                  <td>
+                    <span className="badge badge-error text-white">
+                      {req.bloodGroup}
+                    </span>
+                  </td>
+                  <td>
+                    <span className={`badge 
+                      ${req.status === "pending" && "badge-warning"}
+                      ${req.status === "inprogress" && "badge-info"}
+                      ${req.status === "done" && "badge-success"}
+                      ${req.status === "canceled" && "badge-error"}
+                    `}>
+                      {req.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
 
-        <Card
-          icon={<FaTint />}
-          title="Completed Donations"
-          value={stats.done}
-          color="border-green-500"
-        />
-
-        {(role === 'admin' || role === 'volunteer') && (
-          <Card
-            icon={<FaMoneyBillWave />}
-            title="Total Funds"
-            value={`$${stats.totalFunds}`}
-            color="border-blue-500"
-          />
-        )}
+          {recentRequests.length === 0 && (
+            <p className="text-center py-4 text-gray-400">
+              No requests found
+            </p>
+          )}
+        </div>
       </div>
     </motion.div>
   );

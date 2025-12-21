@@ -1,4 +1,3 @@
-
 import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../Provider/AuthProvider";
 import useAxiosSecure from "../Hooks/useAxiosSecure";
@@ -10,28 +9,36 @@ const AllRequest = () => {
   const [requests, setRequests] = useState([]);
   const [filter, setFilter] = useState("all");
 
+  // load all requests
   useEffect(() => {
-    axiosSecure.get("/donation-requests")
-      .then(res => setRequests(res.data));
+    axiosSecure
+      .get("/donation-requests")
+      .then(res => setRequests(res.data))
+      .catch(err => console.log(err));
   }, [axiosSecure]);
 
-  const handleStatusChange = async (id, status) => {
+  // update donation status
+  const handleStatusChange = async (id, donation_status) => {
     await axiosSecure.patch(`/donation-requests/${id}/status`, {
-      status,
+      status: donation_status,
       donor: {
-        name: user.displayName,
-        email: user.email
-      }
+        name: user?.displayName,
+        email: user?.email,
+      },
     });
+
     const res = await axiosSecure.get("/donation-requests");
     setRequests(res.data);
   };
 
+  // filter data
   const filteredRequests =
     filter === "all"
       ? requests
       : requests.filter(req => req.status === filter);
 
+
+      console.log(requests)
   return (
     <div className="p-6">
       <h2 className="text-2xl font-bold text-red-600 mb-4">
@@ -62,9 +69,9 @@ const AllRequest = () => {
               <th>Recipient</th>
               <th>Blood Group</th>
               <th>Location</th>
-              <th>Date</th>
+              <th>Hospital</th>
               <th>Status</th>
-              <th>Action</th>
+           
             </tr>
           </thead>
 
@@ -72,45 +79,36 @@ const AllRequest = () => {
             {filteredRequests.map((req, index) => (
               <tr key={req._id}>
                 <td>{index + 1}</td>
-                <td>{req.recipientName}</td>
+
+                <td className="text-black">{req.recipientName}</td>
+
                 <td>
                   <span className="badge badge-error text-white">
                     {req.bloodGroup}
                   </span>
                 </td>
-                <td>{req.district}, {req.upazila}</td>
-                <td>{req.donationDate}</td>
 
-                {/* Status */}
+                <td>
+                  {req.district}, {req.upazila}
+                </td>
+
+                <td>{req.hospital}</td>
+
                 <td>
                   <span
-                    className={`badge 
-                    ${req.status === "pending" && "badge-warning"}
-                    ${req.status === "inprogress" && "badge-info"}
-                    ${req.status === "done" && "badge-success"}
-                    ${req.status === "canceled" && "badge-error"}
-                  `}
+                    className={`badge
+                      ${req.status === "pending" && "badge-warning"}
+                      ${req.status === "inprogress" && "badge-info"}
+                      ${req.status === "done" && "badge-success"}
+                      ${req.status === "canceled" && "badge-error"}
+                    `}
                   >
                     {req.status}
                   </span>
                 </td>
 
-                {/* Action */}
                 <td>
-                  {(role === "admin" || role === "volunteer") && (
-                    <select
-                      value={req.status}
-                      onChange={(e) =>
-                        handleStatusChange(req._id, e.target.value)
-                      }
-                      className="select select-sm select-bordered"
-                    >
-                      <option value="pending">Pending</option>
-                      <option value="inprogress">In Progress</option>
-                      <option value="done">Done</option>
-                      <option value="canceled">Canceled</option>
-                    </select>
-                  )}
+             
                 </td>
               </tr>
             ))}
@@ -119,7 +117,7 @@ const AllRequest = () => {
 
         {filteredRequests.length === 0 && (
           <p className="text-center text-gray-500 mt-6">
-            No donation request found.
+            No donation request found
           </p>
         )}
       </div>

@@ -1,156 +1,207 @@
+
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../Provider/AuthProvider";
 import axios from "axios";
 import useAxiosSecure from "../../Hooks/useAxiosSecure";
-import { motion } from "framer-motion";
+
 
 const AddRequest = () => {
-  const { user } = useContext(AuthContext);
-  const axiosSecure = useAxiosSecure();
 
-  const [districts, setDistricts] = useState([]);
-  const [upazilas, setUpazilas] = useState([]);
-  const [selectedDistrict, setSelectedDistrict] = useState("");
+    const { user } = useContext(AuthContext)
+    const [upazilas, setUpazilas] = useState([])
+    const [districts, setDistricts] = useState([])
+    const [district, setDistrict] = useState('')
+    const [upazila, setUpazila] = useState('')
 
-  useEffect(() => {
-    axios.get("/district.json").then(res =>
-      setDistricts(res.data.districts)
+    const axiosSecure = useAxiosSecure()
+
+    useEffect(() => {
+        axios.get('/upazila.json')
+            .then(res => {
+                setUpazilas(res.data.upazilas)
+            })
+
+        axios.get('/district.json')
+            .then(res => {
+                setDistricts(res.data.districts)
+            })
+    }, [])
+
+    const handleRequest = (e) => {
+        e.preventDefault()
+        const form = e.target;
+        const register_name = form.requester_name.value;
+        const requester_email = form.requester_email.value;
+        const recipient_name = form.recipient_name.value;
+        const recipient_district = district
+        const recipient_upazila = upazila
+        const hospital_name = form.hospital_name.value;
+        const full_address = form.full_address.value;
+        const blood_group = form.blood_group.value;
+
+        const formData = {
+            register_name, requester_email, recipient_name, recipient_district, recipient_upazila, hospital_name, full_address, blood_group, donation_status: 'pending'
+        }
+
+
+        axiosSecure.post('/requests', formData)
+            .then(res => {
+                alert(res.data.insertedId)
+            }).catch(err => console.log(err))
+
+
+
+
+
+
+
+
+
+
+    }
+
+
+
+
+
+    return (
+        <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow">
+            <h2 className="text-2xl font-semibold text-center mb-6">
+                Blood Donation Request Form
+            </h2>
+
+            <form onSubmit={handleRequest} className="space-y-4">
+
+                {/* Requester Name */}
+                <div>
+                    <label className="label">Requester Name</label>
+                    <input
+                        name="requester_name"
+                        type="text"
+                        className="input input-bordered w-full"
+                        value={user?.displayName}
+                        readOnly
+                    />
+                </div>
+
+                {/* Requester Email */}
+                <div>
+                    <label className="label">Requester Email</label>
+                    <input
+                        name="requester_email"
+                        type="email"
+                        className="input input-bordered w-full"
+                        value={user?.email}
+                        readOnly
+                    />
+                </div>
+
+                {/* Recipient Name */}
+                <div>
+                    <label className="label">Recipient Name</label>
+                    <input
+                        name="recipient_name"
+                        type="text"
+                        className="input input-bordered w-full"
+                    />
+                </div>
+
+                {/* District */}
+                <div>
+                    <label className="label">Recipient District</label>
+                    <select name="recipient_district" value={district} onChange={(e) => setDistrict(e.target.value)} className="select select-bordered w-full">
+                        <option disabled value=''>Select Your District</option>
+
+                        {districts?.map(d => (
+                            <option value={d?.name} key={d.id}>
+                                {d?.name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                {/* Upazila */}
+                <div>
+                    <label className="label">Recipient Upazila</label>
+                    <select name="recipient_upazila" value={upazila} onChange={(e) => setUpazila(e.target.value)} className="select select-bordered w-full">
+                        <option disabled value=''>Select Your Upazila</option>
+
+                        {upazilas?.map(d => (
+                            <option value={d?.name} key={d.id}>
+                                {d?.name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                {/* Hospital */}
+                <div>
+                    <label className="label">Hospital Name</label>
+                    <input
+                        name="hospital_name"
+                        type="text"
+                        className="input input-bordered w-full"
+                        placeholder="Dhaka Medical College Hospital"
+                    />
+                </div>
+
+                {/* Address */}
+                <div>
+                    <label className="label">Full Address Line</label>
+                    <input
+                        name="full_address"
+                        type="text"
+                        className="input input-bordered w-full"
+                        placeholder="Zahir Raihan Rd, Dhaka"
+                    />
+                </div>
+
+                {/* Blood Group */}
+                <div>
+                    <label className="label">Blood Group</label>
+                    <select name="blood_group" className="select select-bordered w-full">
+                        <option value="">-- Select Blood Group --</option>
+                    <option value="">Choose Blood Group</option>
+                                    <option value="A+">A+</option>
+                                    <option value="A-">A-</option>
+                                    <option value="B+">B+</option>
+                                    <option value="B-">B-</option>
+                                    <option value="AB+">AB+</option>
+                                    <option value="AB-">AB-</option>
+                                    <option value="O+">O+</option>
+                                    <option value="O-">O-</option>
+                    </select>
+                </div>
+
+                {/* Date */}
+                <div>
+                    <label className="label">Donation Date</label>
+                    <input type="date" className="input input-bordered w-full" />
+                </div>
+
+                {/* Time */}
+                <div>
+                    <label className="label">Donation Time</label>
+                    <input type="time" className="input input-bordered w-full" />
+                </div>
+
+                {/* Message */}
+                <div>
+                    <label className="label">Request Message</label>
+                    <textarea
+                        className="textarea textarea-bordered w-full"
+                        placeholder="Explain why you need blood..."
+                    ></textarea>
+                </div>
+
+                {/* Button */}
+                <button className="btn btn-error w-full text-white">
+                    Request
+                </button>
+
+            </form>
+        </div>
     );
-    axios.get("/upazila.json").then(res =>
-      setUpazilas(res.data.upazilas)
-    );
-  }, []);
-
-  // ✅ FIXED FILTER (district_id based)
-  const filteredUpazilas = upazilas.filter(
-    u => String(u.district_id) === String(selectedDistrict)
-  );
-
-  const handleRequest = e => {
-    e.preventDefault();
-    const form = e.target;
-
-    const requestData = {
-      requesterName: user?.displayName,
-      requesterEmail: user?.email,
-      recipientName: form.recipientName.value,
-      districtId: selectedDistrict,   // ✅ store district id
-      upazila: form.upazila.value,
-      hospital: form.hospital.value,
-      address: form.address.value,
-      bloodGroup: form.bloodGroup.value,
-      donationDate: form.date.value,
-      donationTime: form.time.value,
-      message: form.message.value,
-      status: "pending",
-      createdAt: new Date()
-    };
-
-    axiosSecure.post("/requests", requestData)
-      .then(() => {
-        alert("Blood request created successfully ❤️");
-        form.reset();
-        setSelectedDistrict("");
-      })
-      .catch(err => console.error(err));
-  };
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-      className="max-w-3xl mx-auto p-6 bg-white rounded-xl shadow-md"
-    >
-      <h2 className="text-3xl font-bold text-center text-red-600 mb-6">
-        🩸 Create Blood Donation Request
-      </h2>
-
-      <form
-        onSubmit={handleRequest}
-        className="grid grid-cols-1 md:grid-cols-2 gap-4"
-      >
-        <input
-          value={user?.displayName}
-          readOnly
-          className="input input-bordered"
-        />
-
-        <input
-          value={user?.email}
-          readOnly
-          className="input input-bordered"
-        />
-
-        <input
-          name="recipientName"
-          placeholder="Recipient Name"
-          required
-          className="input input-bordered"
-        />
-
-        {/* ✅ District select uses ID */}
-        <select
-          value={selectedDistrict}
-          onChange={e => setSelectedDistrict(e.target.value)}
-          required
-          className="select select-bordered"
-        >
-          <option value="">Select District</option>
-          {districts.map(d => (
-            <option key={d.id} value={d.id}>
-              {d.name}
-            </option>
-          ))}
-        </select>
-
-        {/* ✅ Filtered Upazila */}
-        <select name="upazila" required className="select select-bordered">
-          <option value="">Select Upazila</option>
-          {filteredUpazilas.map(u => (
-            <option key={u.id} value={u.name}>
-              {u.name}
-            </option>
-          ))}
-        </select>
-
-        <input
-          name="hospital"
-          placeholder="Hospital Name"
-          required
-          className="input input-bordered"
-        />
-
-        <input
-          name="address"
-          placeholder="Full Address"
-          required
-          className="input input-bordered"
-        />
-
-        <select name="bloodGroup" required className="select select-bordered">
-          <option value="">Blood Group</option>
-          {["A+","A-","B+","B-","AB+","AB-","O+","O-"].map(bg => (
-            <option key={bg} value={bg}>{bg}</option>
-          ))}
-        </select>
-
-        <input name="date" type="date" required className="input input-bordered" />
-        <input name="time" type="time" required className="input input-bordered" />
-
-        <textarea
-          name="message"
-          className="textarea textarea-bordered md:col-span-2"
-          placeholder="Explain why blood is needed..."
-          required
-        />
-
-        <button className="btn btn-error md:col-span-2 text-white">
-          Submit Request
-        </button>
-      </form>
-    </motion.div>
-  );
 };
 
 export default AddRequest;
