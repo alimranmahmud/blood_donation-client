@@ -2,12 +2,14 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import useAxios from '../Hooks/useAxios';
 import { motion } from 'framer-motion';
+import BloodRequestCard from '../Componets/BloodRequestCard';
 
 const SearchRequest = () => {
   const [upazilas, setUpazilas] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [district, setDistrict] = useState('');
   const [upazila, setUpazila] = useState('');
+  const [searchData, setSearchData]=useState([])
   const axiosInstance = useAxios();
 
   useEffect(() => {
@@ -23,6 +25,7 @@ const SearchRequest = () => {
       `/search-requests?bloodGroup=${bloodGroup}&district=${district}&upazila=${upazila}`
     ).then(res => {
       console.log(res.data);
+      setSearchData(res.data)
     });
   };
 
@@ -95,6 +98,54 @@ const SearchRequest = () => {
           </button>
         </form>
       </div>
+
+      {/* blood_group
+: 
+"O+"
+createdAt
+: 
+"2025-12-24T07:27:47.538Z"
+donation_status
+: 
+"pending"
+full_address
+: 
+"sdfgsdfg"
+hospital_name
+: 
+"sdfgsd"
+recipient_district
+: 
+"Faridpur"
+recipient_name
+: 
+"dsfgsdfg"
+recipient_upazila
+: 
+"Amtali"
+register_name
+: 
+"Mir Jakariya"
+requester_email
+: 
+"jakariya.web.instructor@gmail.com"
+_id
+: 
+"694b95f3379aa1516d8691d1" */}
+
+<div>
+{
+  searchData.map(search => (
+    <BloodRequestCard
+      key={search._id}
+      card={search}
+    />
+  ))
+}
+
+</div>
+
+
     </motion.div>
   );
 };

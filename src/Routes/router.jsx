@@ -53,7 +53,7 @@ const router = createBrowserRouter([
   path: "/card_details/:id",
   loader: async ({ params }) => {
     const res = await fetch(
-      `http://localhost:5000/card_details/${params.id}`
+      `https://blood-web-server.vercel.app/card_details/${params.id}`
     );
 
     if (!res.ok) {
